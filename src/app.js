@@ -16,6 +16,7 @@ import {
         __dirname
 }
 from './utils.js';
+import { initializePassport } from './config/passport.config.js';
 import productRouter from './routes/api/products.router.js';
 import cartRouter from './routes/api/cart.router.js';
 import chatRouter from './routes/api/message.router.js';
@@ -28,6 +29,8 @@ import viewsRouter from './routes/web/views.router.js';
 import Products from './dao/dbManagers/products.manager.js';
 import Carts from './dao/dbManagers/cart.manager.js';
 import Messages from './dao/dbManagers/message.manager.js';
+import passport from 'passport';
+
 
 
 
@@ -80,6 +83,11 @@ app.use(session({
         resave: true,
         saveUninitialized: true
 }));
+
+// configuracion passport
+initializePassport();
+app.use(passport.initialize())
+app.use(passport.session())
 
 // Ruta view
 app.use('/', viewsRouter);

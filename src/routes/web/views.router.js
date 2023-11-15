@@ -31,7 +31,7 @@ const privateAccess = (req, res, next) => {
 
 router.get('/productsLog', async (req, res) => { 
     
-    res.render('home', { products: await prodManager.getAll() });
+    res.render('home', { products: await prodManager.getAll(req) });
     
 });
 
@@ -63,7 +63,7 @@ router.get('/', privateAccess, async (req, res) => {
 });
 
 router.get('/realTimeProducts', async (req, res) => { 
-    res.render('realTimeProducts', { products: await prodManager.getAll() });
+    res.render('realTimeProducts', { products: await prodManager.getAll(req) });
 });
 
 router.get('/products', async (req, res) => { 
