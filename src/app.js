@@ -9,6 +9,7 @@ import {
 import session from 'express-session';
 import fileStore from 'session-file-store';
 import MongoStore from 'connect-mongo';
+import passport from 'passport';
 
 //dependencias de ruta
 
@@ -29,7 +30,7 @@ import viewsRouter from './routes/web/views.router.js';
 import Products from './dao/dbManagers/products.manager.js';
 import Carts from './dao/dbManagers/cart.manager.js';
 import Messages from './dao/dbManagers/message.manager.js';
-import passport from 'passport';
+
 
 
 

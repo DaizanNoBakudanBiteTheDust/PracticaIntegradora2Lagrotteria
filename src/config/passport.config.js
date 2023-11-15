@@ -1,6 +1,6 @@
 import passport from 'passport';
 import local from 'passport-local';
-import usersModel from '../dao/dbManagers/models/users.models';
+import usersModel from '../dao/dbManagers/models/users.models.js';
 import { createHash, isValidPassword } from '../utils.js';
 
 
