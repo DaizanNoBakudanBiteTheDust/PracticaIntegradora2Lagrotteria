@@ -30,24 +30,19 @@ router.post('/login', passport.authenticate('login', {
     failureRedirect: 'fail-login'
 }), async (req, res) => {
    
-    req.session.user = {
-        name: 'Admin', // O cualquier otro nombre para el administrador
-        email: email,
-        role: 'admin'
-    };
-
-    if (email === 'adminCoder@coder.com' || password === 'adminCod3r123') {
-        return res.send({ status: 'success', message: 'Inicio de sesión como administrador exitoso' });
-    }
-
     if(!req.user) {
         return res.status(401).send({ status: 'error', message: 'invalid credentials' })
-    }
+    }    
 
     req.session.user = {
         name: `${req.user.first_name} ${req.user.last_name}`,
         email: req.user.email,
         age: req.user.age
+    }
+
+    if (req.user.email === 'adminCoder@coder.com' && req.body.password === 'adminCod3r123') {
+        req.session.user.role = 'admin'; // Establecer el rol como 'admin'
+        return res.status(201).send({ status: 'success', message: 'Inicio de sesión como administrador exitoso' });
     }
     
 
