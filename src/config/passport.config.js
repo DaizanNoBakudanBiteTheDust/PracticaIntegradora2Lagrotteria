@@ -1,38 +1,41 @@
 import passport from 'passport';
-import local from 'passport-local';
+import GitHubStrategy from 'passport-github2';
 import usersModel from '../dao/dbManagers/models/users.models.js';
-import { createHash, isValidPassword } from '../utils.js';
 
-
-//local
-const localStrategy = local.Strategy;
 
 const initializePassport = () => {
     //registro
-    passport.use('register', new localStrategy({
-        passReqToCallback: true,
-        usernameField: 'email'
-    }, async(req, username, password, done) => {
+    passport.use('github', new GitHubStrategy({
+        clientID:  'Iv1.da29b1c177ee2618',
+        clientSecret: '0f8c0a891165fcb2a006b0ea1c5f443478e15fba',
+        callbackURL: 'http://localhost:8080/api/sessions/github-callback',
+        scope:['user:email']
+    }, async(accessToken, refreshToken, profile, done) => {
         try {
-            const { first_name, last_name, age } = req.body;
-            const user = await usersModel.findOne({ email: username });
-            
-            if(user){
-                return done(null. false)
-            }
+            console.log(profile);
+            /*{ 
+                _json:{
+                    name: 'alex'
+                }
+                emails: [{value: 'ap@hotmail.com'}]
+            }*/
+            const email = profile.emails[0].value;
+            const user = await usersModel.findOne({ email });
 
-            const userToSave ={
-                first_name,
-                last_name,
-                email: username,
-                age,
-                password: createHash(password)
-            }
+            if(!user){
+                const newUser = {
+                    first_name: profile._json.name,
+                    last_name: '',
+                    age: 18,
+                    email,
+                    password: ''
+                }
 
-            const result = await usersModel.create(userToSave);
-
+                const result = await usersModel.create(newUser);
             return done(null, result);
-
+            }else{
+                return done(null, user)
+            }         
         } catch (error) {
             
             return done('incorrect credentials');

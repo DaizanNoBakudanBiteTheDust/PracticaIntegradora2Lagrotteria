@@ -42,7 +42,7 @@ router.post('/login', passport.authenticate('login', {
 
     if (req.user.email === 'adminCoder@coder.com' && req.body.password === 'adminCod3r123') {
         req.session.user.role = 'admin'; // Establecer el rol como 'admin'
-        return res.status(201).send({ status: 'success', message: 'Inicio de sesión como administrador exitoso' });
+        return res.status(200).send({ status: 'success', message: 'Inicio de sesión como administrador exitoso' });
     }
     
 
