@@ -1,10 +1,40 @@
 import passport from 'passport';
 import GitHubStrategy from 'passport-github2';
+import local from 'passport-local';
 import usersModel from '../dao/dbManagers/models/users.models.js';
+import { createHash, isValidPassword } from '../utils.js';
 
+//local
+const localStrategy = local.Strategy;
 
 const initializePassport = () => {
     //registro
+    passport.use('register', new localStrategy({
+        passReqToCallback: true, //permite acceder al objeto request como cualquier otro middleware
+        usernameField: 'email'
+    }, async (req, username, password, done) => {
+        try {
+            const { first_name, last_name, age } = req.body;
+            const user = await usersModel.findOne({ email: username });
+            
+            if(user) {
+                return done(null, false);
+            }
+
+            const userToSave = {
+                first_name,
+                last_name,
+                email: username,
+                age,
+                password: createHash(password)
+            }
+
+            const result = await usersModel.create(userToSave);
+            return done(null, result); //req.user {first,last,age,email}
+        } catch (error) {
+            return done(`Incorrect credentialss`)
+        }
+    }));
     passport.use('github', new GitHubStrategy({
         clientID:  'Iv1.da29b1c177ee2618',
         clientSecret: '0f8c0a891165fcb2a006b0ea1c5f443478e15fba',
@@ -13,12 +43,7 @@ const initializePassport = () => {
     }, async(accessToken, refreshToken, profile, done) => {
         try {
             console.log(profile);
-            /*{ 
-                _json:{
-                    name: 'alex'
-                }
-                emails: [{value: 'ap@hotmail.com'}]
-            }*/
+           
             const email = profile.emails[0].value;
             const user = await usersModel.findOne({ email });
 
@@ -49,14 +74,14 @@ const initializePassport = () => {
         try {
             const user = await usersModel.findOne({ email: username});
             if(!user || !isValidPassword(password, user.password)){
-                return done(null. false)
+                return done(null, false)
             }
 
             return done(null, user);
 
         } catch (error) {
             
-            return done('incorrect credentials');
+            return done('incorrect credensstials');
 
         }
     })) 

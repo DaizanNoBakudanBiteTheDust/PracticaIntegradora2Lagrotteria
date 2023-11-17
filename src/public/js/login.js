@@ -23,4 +23,7 @@ form.addEventListener('submit', e => {
               });
         }
     })
+    .catch(error => {
+        console.error('Error en la petición fetch:', error);
+    });
 })

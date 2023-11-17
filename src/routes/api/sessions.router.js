@@ -19,7 +19,7 @@ router.post('/register', passport.authenticate('register', {
     });
 });
 
-router.get('failure-register', async (req, res) => {
+router.get('/fail-register', async (req, res) => {
     res.status(500).send({
         status: 'error',
         message: 'register failed'
@@ -45,15 +45,13 @@ router.post('/login', passport.authenticate('login', {
         return res.status(200).send({ status: 'success', message: 'Inicio de sesión como administrador exitoso' });
     }
     
-
-
     res.status(201).send({
         status: 'success',
         message: 'login success'
     });
 });
 
-router.get('fail-login', async (req, res) => {
+router.get('/fail-login', async (req, res) => {
     res.status(500).send({
         status: 'error',
         message: 'login failed'
@@ -69,5 +67,14 @@ router.get('/logout', (req, res) => {
         res.redirect('/');
     })
 })
+
+router.get('/github', passport.authenticate('github', {scope: ['user:email']}), async(req, res) => {
+    res.send({ status: 'success', message: 'user registered' });
+});
+
+router.get('/github-callback', passport.authenticate('github', { failureRedirect: '/login' }), async(req, res) => {
+    req.session.user = req.user;
+    res.redirect('/');
+});
 
 export default router;
