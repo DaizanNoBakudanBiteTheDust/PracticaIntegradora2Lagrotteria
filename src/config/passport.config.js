@@ -32,7 +32,7 @@ const initializePassport = () => {
             const result = await usersModel.create(userToSave);
             return done(null, result); //req.user {first,last,age,email}
         } catch (error) {
-            return done(`Incorrect credentialss`)
+            console.log(error)
         }
     }));
     passport.use('github', new GitHubStrategy({
@@ -63,7 +63,7 @@ const initializePassport = () => {
             }         
         } catch (error) {
             
-            return done('incorrect credentials');
+            console.log(error)
 
         }
     }));
@@ -81,7 +81,7 @@ const initializePassport = () => {
 
         } catch (error) {
             
-            return done('incorrect credensstials');
+            console.log(error)
 
         }
     })) 
