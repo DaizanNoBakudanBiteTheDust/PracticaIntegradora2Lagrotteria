@@ -67,12 +67,19 @@ router.get('/', privateAccess, async (req, res) => {
         // El usuario está autenticado mediante JWT, puedes acceder a la información del usuario en req.user
         const user = req.user;
 
+        let userData = user;
+
+        if (user && user._doc) {
+            // Utiliza _doc si está presente (por ejemplo, en la estrategia JWT)
+            userData = user._doc;
+        }
+
         console.log(user);
         // Obtener todos los productos
         const allProducts = await prodManager.getAll(req);
 
         res.render('home', {
-            user: user._doc,
+            user: userData,
             products: allProducts
         });
     } catch (error) {

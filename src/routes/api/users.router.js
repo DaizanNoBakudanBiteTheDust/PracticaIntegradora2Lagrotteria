@@ -64,8 +64,11 @@ router.post('/login', async (req, res) => {
     console.log(user.carts)
 
     //generar el jwt
-    const { password: _, ...userResult } = user;
-    const accessToken = generateToken(userResult);    
+    const {
+        password: _,
+        ...userResult
+    } = user;
+    const accessToken = generateToken(userResult);
     res.cookie('coderCookieToken', accessToken, {
         maxAge: 60 * 60 * 1000,
         httpOnly: true
@@ -106,9 +109,32 @@ router.get('/github', passport.authenticate('github', {
 });
 
 router.get('/github-callback', passport.authenticate('github', {
-    failureRedirect: '/login'
+    failureRedirect: '/login',
+    scope: ['user:email']
 }), async (req, res) => {
-    res.redirect('/');
+    try {
+        const user = req.user;
+        const {
+            password: _,
+            ...userResult
+        } = user;
+        const accessToken = generateToken(userResult);
+        res.cookie('coderCookieToken', accessToken, {
+            maxAge: 60 * 60 * 1000,
+            httpOnly: true
+        }).send({
+            accessToken,
+            status: 'success',
+            message: 'login success'
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            status: 'error',
+            message: 'Hubo un error al procesar la autenticación'
+        });
+    }
+
 });
 
 router.get('/current', passport.authenticate('jwt', {
