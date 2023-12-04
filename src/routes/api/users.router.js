@@ -33,11 +33,12 @@ const adminUser = {
     password: 'adminCod3r123'
 };
 
+
 router.post('/login', async (req, res) => {
         const { email, password } = req.body;
 
         if (email === 'adminCoder@coder.com' || password === 'adminCod3r123') {
-            req.session.user = {
+            req.user = {
                 name: 'Admin', // O cualquier otro nombre para el administrador
                 email: email,
                 role: 'admin'
@@ -51,8 +52,7 @@ router.post('/login', async (req, res) => {
         //generar el jwt
         const { password: _, ...userResult } = user;
         const accessToken = generateToken(userResult);    
-        res.cookie('coderCookieToken', accessToken, { maxAge: 60 * 60 * 1000, httpOnly: true }).send({ status: 'success', message: 'login success' })
-
+        res.cookie('coderCookieToken', accessToken, { maxAge: 60 * 60 * 1000, httpOnly: true }).send({ accessToken, status: 'success', message: 'login success' })
 });
 
 
@@ -64,14 +64,16 @@ router.get('/fail-login', async (req, res) => {
 });
 
 router.get('/logout', (req, res) => {
-    req.session.destroy(error => {
-        if (error) return res.status(500).send({
-            status: 'error',
-            message: error.message
-        });
-        res.redirect('/');
-    })
-})
+    req.session.destroy((err) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Error interno del servidor');
+        }
+        res.clearCookie('connect.sid');
+        res.clearCookie('coderCookieToken');
+        res.redirect('/login'); // Redirige a donde quieras después del logout
+});
+});
 
 router.get('/github', passport.authenticate('github', {scope: ['user:email']}), async(req, res) => {
     res.send({ status: 'success', message: 'user registered' });

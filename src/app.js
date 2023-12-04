@@ -57,6 +57,10 @@ try {
 }
 
 
+// configuracion passport
+initializePassport();
+app.use(passport.initialize())
+
 //Servidor archivos estaticos
 
 app.use(express.static(`${__dirname}/public`));
@@ -68,14 +72,12 @@ app.use(express.urlencoded({
 }));
 app.use(cookieParser());
 
+
 // handlebars
 
 app.engine('handlebars', handlebars.engine());
 app.set('views', `${__dirname}/views`)
 app.set('view engine', 'handlebars');
-
-
-
 
 app.use(session({
         store: MongoStore.create({
@@ -86,11 +88,6 @@ app.use(session({
         resave: true,
         saveUninitialized: true
 }));
-
-// configuracion passport
-initializePassport();
-app.use(passport.initialize())
-
 
 // Ruta view
 app.use('/', viewsRouter);

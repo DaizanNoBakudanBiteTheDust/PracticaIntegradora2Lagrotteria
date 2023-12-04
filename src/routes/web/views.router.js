@@ -14,6 +14,7 @@ import jwt from 'passport-jwt';
 import {
     productsModel
 } from "../../dao/dbManagers/models/products.models.js";
+import { PRIVATE_KEY_JWT } from '../../config/constants.js';
 
 const router = Router();
 
@@ -21,21 +22,34 @@ const prodManager = new Products();
 const cartManager = new Carts();
 const chatManager = new Messages();
 
+
+const passportJWT = passport.authenticate('jwt', {
+    session: false
+});
+
 const publicAccess = (req, res, next) => {
-    if(req.session?.user) return res.redirect('/');
+    if(req.user) return res.redirect('/');
     next();
 }
 
 const privateAccess = (req, res, next) => {
-    if(!req.session?.user) return res.redirect('/login');
-    next();
+    passportJWT(req, res, (err) => {
+        if (err || !req.user) {
+            return res.redirect('/login');
+        }
+        next();
+    });
 }
 
-router.get('/productsLog', async (req, res) => { 
-    
-    res.render('home', { products: await prodManager.getAll(req) });
-    
+router.get('/productsLog', async (req, res) => {
+
+    res.render('home', {
+        products: await prodManager.getAll(req)
+    });
+
 });
+
+
 
 router.get('/register', publicAccess, (req, res) => {
     res.render('register')
@@ -46,16 +60,12 @@ router.get('/login', publicAccess, (req, res) => {
 });
 
 
-router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+router.get('/', privateAccess, async (req, res) => {
     try {
-        if (!req.user) {
-            return res.status(401).send('Usuario no autenticado');
-        }
-
         // El usuario está autenticado mediante JWT, puedes acceder a la información del usuario en req.user
         const user = req.user;
 
-        console.log(user)
+        console.log(user);
         // Obtener todos los productos
         const allProducts = await prodManager.getAll(req);
 
@@ -70,50 +80,64 @@ router.get('/', passport.authenticate('jwt', { session: false }), async (req, re
 });
 
 
-router.get('/realTimeProducts', async (req, res) => { 
-    res.render('realTimeProducts', { products: await prodManager.getAll(req) });
+
+
+router.get('/realTimeProducts', async (req, res) => {
+    res.render('realTimeProducts', {
+        products: await prodManager.getAll(req)
+    });
 });
 
-router.get('/products', async (req, res) => { 
-  
-    const limit = parseInt(req.query.limit) || 10; 
-    const page = parseInt(req.query.page) || 1;    
-    const sort = req.query.sort || null; 
+router.get('/products', async (req, res) => {
+
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+    const sort = req.query.sort || null;
     const query = req.query.query || null;
     const queryValue = req.query.queryValue || null;
 
-     // Configurar las opciones de búsqueda
-     const options = {
+    // Configurar las opciones de búsqueda
+    const options = {
         limit,
         page,
         lean: true
     };
 
     if (sort !== null) {
-    options.sort = sort; // Aplica el valor de sort solo si no es null
+        options.sort = sort; // Aplica el valor de sort solo si no es null
     }
 
     const filter = {};
 
     if (query !== null && queryValue !== null) {
         filter[query] = queryValue; // Aplica el valor de sort solo si no es null
-        }
+    }
 
-     // Se agrega lógica para determinar el orden
-     if (sort !== null) {
+    // Se agrega lógica para determinar el orden
+    if (sort !== null) {
         if (sort.toLowerCase() === 'asc') {
-            
-            options.sort = { precio: 'asc' };
+
+            options.sort = {
+                precio: 'asc'
+            };
         } else if (sort.toLowerCase() === 'desc') {
-            options.sort = { precio: 'desc' };
+            options.sort = {
+                precio: 'desc'
+            };
         }
     }
 
     // se agregan parametros de paginacion
 
-    const {docs, hasPrevPage, hasNextPage, nextPage, prevPage} = await productsModel.paginate(filter, options);
-    
-    res.render('products', { 
+    const {
+        docs,
+        hasPrevPage,
+        hasNextPage,
+        nextPage,
+        prevPage
+    } = await productsModel.paginate(filter, options);
+
+    res.render('products', {
         products: docs,
         hasPrevPage,
         hasNextPage,
@@ -122,25 +146,30 @@ router.get('/products', async (req, res) => {
         limit: limit,
         page,
         query,
-        sort });
+        sort
+    });
 
 });
 
-router.get('/realTimeCarts', async (req, res) => { 
-    res.render('realTimeCarts', { carts: await cartManager.getAll() });
+router.get('/realTimeCarts', async (req, res) => {
+    res.render('realTimeCarts', {
+        carts: await cartManager.getAll()
+    });
 });
 
-router.get('/cart', async (req, res) => { 
+router.get('/cart', async (req, res) => {
     const cartById = '6548f637d8891916f4b7065b';
-    const cartData = await cartManager.getCartById({_id: cartById});
+    const cartData = await cartManager.getCartById({
+        _id: cartById
+    });
 
     const transformedData = cartData.products.map(product => ({
         product: product.product, // Ajusta según tu estructura real
         quantity: product.quantity,
         _id: product._id
-      }));
+    }));
 
-    
+
     // Comprueba si el carrito se encontró
     if (!cartData) {
         return res.status(404).send('Carrito no encontrado');
@@ -150,11 +179,15 @@ router.get('/cart', async (req, res) => {
 
     console.log(products);
 
-    res.render('cartId', { cartProducts: products });
+    res.render('cartId', {
+        cartProducts: products
+    });
 });
 
-router.get('/chat', async (req, res) => { 
-    res.render('chat', { chat: await chatManager.getAll() });
+router.get('/chat', async (req, res) => {
+    res.render('chat', {
+        chat: await chatManager.getAll()
+    });
 });
 
 
