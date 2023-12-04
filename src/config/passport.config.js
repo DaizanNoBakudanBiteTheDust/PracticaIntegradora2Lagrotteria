@@ -1,11 +1,18 @@
 import passport from 'passport';
 import GitHubStrategy from 'passport-github2';
 import local from 'passport-local';
+import jwt from 'passport-jwt';
 import usersModel from '../dao/dbManagers/models/users.models.js';
 import { createHash, isValidPassword } from '../utils.js';
+import {passportStrategiesEnum, accessRolesEnum} from '../config/enums.js';
+import {PRIVATE_KEY_JWT} from '../config/constants.js';
 
 //local
 const localStrategy = local.Strategy;
+
+// estrategia JWT
+const JWTSrategy = jwt.Strategy;
+const ExtractJWT = jwt.ExtractJwt;
 
 const initializePassport = () => {
     //registro
@@ -97,6 +104,17 @@ const initializePassport = () => {
         done(null, user);
         
     })
+
+    passport.use(passportStrategiesEnum.JWT, new JWTSrategy({
+        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+        secretOrKey: PRIVATE_KEY_JWT
+    }, async(jwt_payload, done) => {
+        try {
+            return done(null, jwt_payload.user)//req.user
+        } catch (error) {
+            return done(error);
+        }
+    }))
 }
 
 export {initializePassport};

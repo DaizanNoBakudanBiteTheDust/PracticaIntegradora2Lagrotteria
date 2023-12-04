@@ -5,7 +5,8 @@ import passport from 'passport';
 import usersModel from '../../dao/dbManagers/models/users.models.js';
 import {
     createHash,
-    isValidPassword
+    isValidPassword,
+    generateToken
 } from '../../utils.js';
 
 const router = Router();
@@ -56,8 +57,10 @@ router.post('/login', async (req, res) => {
                 age: user.age,
                 role: 'user'
             };
+
+            const accessToken = generateToken(user);
     
-            return res.status(200).send({ status: 'success', message: 'Inicio de sesión exitoso' });
+            return res.status(200).send({accessToken, status: 'success', message: 'Inicio de sesión exitoso' });
         })(req, res);
     
 

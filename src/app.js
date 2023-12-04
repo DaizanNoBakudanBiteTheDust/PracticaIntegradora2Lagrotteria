@@ -21,7 +21,7 @@ import { initializePassport } from './config/passport.config.js';
 import productRouter from './routes/api/products.router.js';
 import cartRouter from './routes/api/cart.router.js';
 import chatRouter from './routes/api/message.router.js';
-import sessionRouter from './routes/api/sessions.router.js';
+import sessionRouter from './routes/api/users.router.js';
 import viewsRouter from './routes/web/views.router.js';
 
 
@@ -102,7 +102,7 @@ app.use('/api/carts', cartRouter);
 // Ruta chat
 app.use('/api/chat', chatRouter);
 
-// Ruta chat
+// Ruta Session
 app.use('/api/sessions', sessionRouter);
 
 
