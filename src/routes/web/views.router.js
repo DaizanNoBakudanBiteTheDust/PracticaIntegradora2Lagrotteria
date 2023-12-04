@@ -27,6 +27,8 @@ const passportJWT = passport.authenticate('jwt', {
     session: false
 });
 
+const GithubStr = passport.authenticate('github', { session: false});
+
 const publicAccess = (req, res, next) => {
     if(req.user) return res.redirect('/');
     next();

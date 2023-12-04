@@ -84,6 +84,7 @@ app.use(session({
                client:mongoose.connection.getClient(),
                ttl: 3600    
         }),
+        name: 'te odio cookie maldita',
         secret: 'c0d3rS3cr3tC0d',
         resave: true,
         saveUninitialized: true

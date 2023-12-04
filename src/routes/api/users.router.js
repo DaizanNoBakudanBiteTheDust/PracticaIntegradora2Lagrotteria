@@ -8,6 +8,12 @@ import {
     isValidPassword,
     generateToken
 } from '../../utils.js';
+import Users from '../../dao/dbManagers/users.manager.js';
+import Carts from '../../dao/dbManagers/cart.manager.js';
+
+const manager = new Users();
+const cartManager = new Carts();
+
 
 const router = Router();
 
@@ -35,24 +41,39 @@ const adminUser = {
 
 
 router.post('/login', async (req, res) => {
-        const { email, password } = req.body;
+    const {
+        email,
+        password
+    } = req.body;
 
-        if (email === 'adminCoder@coder.com' || password === 'adminCod3r123') {
-            req.user = {
-                name: 'Admin', // O cualquier otro nombre para el administrador
-                email: email,
-                role: 'admin'
-            };
+    if (email === 'adminCoder@coder.com' || password === 'adminCod3r123') {
+        req.user = {
+            name: 'Admin', // O cualquier otro nombre para el administrador
+            email: email,
+            role: 'admin'
+        };
 
-            return res.send({ status: 'success', message: 'Inicio de sesión como administrador exitoso' });
-        }
-       
-        const user = await usersModel.findOne({ email: email });
+        return res.send({
+            status: 'success',
+            message: 'Inicio de sesión como administrador exitoso'
+        });
+    }
 
-        //generar el jwt
-        const { password: _, ...userResult } = user;
-        const accessToken = generateToken(userResult);    
-        res.cookie('coderCookieToken', accessToken, { maxAge: 60 * 60 * 1000, httpOnly: true }).send({ accessToken, status: 'success', message: 'login success' })
+    const user = await manager.getByEmail(email);
+
+    console.log(user.carts)
+
+    //generar el jwt
+    const { password: _, ...userResult } = user;
+    const accessToken = generateToken(userResult);    
+    res.cookie('coderCookieToken', accessToken, {
+        maxAge: 60 * 60 * 1000,
+        httpOnly: true
+    }).send({
+        accessToken,
+        status: 'success',
+        message: 'login success'
+    })
 });
 
 
@@ -72,21 +93,31 @@ router.get('/logout', (req, res) => {
         res.clearCookie('connect.sid');
         res.clearCookie('coderCookieToken');
         res.redirect('/login'); // Redirige a donde quieras después del logout
-});
-});
-
-router.get('/github', passport.authenticate('github', {scope: ['user:email']}), async(req, res) => {
-    res.send({ status: 'success', message: 'user registered' });
+    });
 });
 
-router.get('/github-callback', passport.authenticate('github', { failureRedirect: '/login' }), async(req, res) => {
-    req.session.user = req.user;
+router.get('/github', passport.authenticate('github', {
+    scope: ['user:email']
+}), async (req, res) => {
+    res.send({
+        status: 'success',
+        message: 'user registered'
+    });
+});
+
+router.get('/github-callback', passport.authenticate('github', {
+    failureRedirect: '/login'
+}), async (req, res) => {
     res.redirect('/');
 });
 
-router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.get('/current', passport.authenticate('jwt', {
+    session: false
+}), (req, res) => {
     // Si el middleware de autenticación JWT pasa, req.user contendrá la información del usuario extraída del token
-    res.status(200).json({ user: req.user });
+    res.status(200).json({
+        user: req.user
+    });
 });
 
 export default router;
