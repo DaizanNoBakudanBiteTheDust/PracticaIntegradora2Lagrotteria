@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 import {
         Server
 } from 'socket.io';
-// import cookieParser, { signedCookie } from 'cookie-parser';
+import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import fileStore from 'session-file-store';
 import MongoStore from 'connect-mongo';
@@ -66,12 +66,14 @@ app.use(express.json({}));
 app.use(express.urlencoded({
         extended: true
 }));
+app.use(cookieParser());
 
 // handlebars
 
 app.engine('handlebars', handlebars.engine());
 app.set('views', `${__dirname}/views`)
 app.set('view engine', 'handlebars');
+
 
 
 
@@ -88,7 +90,7 @@ app.use(session({
 // configuracion passport
 initializePassport();
 app.use(passport.initialize())
-app.use(passport.session())
+
 
 // Ruta view
 app.use('/', viewsRouter);

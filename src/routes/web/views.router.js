@@ -8,6 +8,8 @@ import Products from '../../dao/dbManagers/products.manager.js';
 import Carts from '../../dao/dbManagers/cart.manager.js';
 import Messages from '../../dao/dbManagers/message.manager.js';
 import usersModel from '../../dao/dbManagers/models/users.models.js';
+import passport from 'passport';
+import jwt from 'passport-jwt';
 
 import {
     productsModel
@@ -43,24 +45,30 @@ router.get('/login', publicAccess, (req, res) => {
     res.render('login')
 });
 
-router.get('/', privateAccess, async (req, res) => {
-     try {
-        const user = req.session.user;
 
+router.get('/', passport.authenticate('jwt', { session: false }), async (req, res) => {
+    try {
+        if (!req.user) {
+            return res.status(401).send('Usuario no autenticado');
+        }
+
+        // El usuario está autenticado mediante JWT, puedes acceder a la información del usuario en req.user
+        const user = req.user;
+
+        console.log(user)
         // Obtener todos los productos
         const allProducts = await prodManager.getAll(req);
 
         res.render('home', {
-            message: `Bienvenido ${user.username}`,
-            user: user,
+            user: user._doc,
             products: allProducts
         });
     } catch (error) {
-        // Manejar errores aquí
         console.error(error);
         res.status(500).send('Error interno del servidor');
     }
 });
+
 
 router.get('/realTimeProducts', async (req, res) => { 
     res.render('realTimeProducts', { products: await prodManager.getAll(req) });

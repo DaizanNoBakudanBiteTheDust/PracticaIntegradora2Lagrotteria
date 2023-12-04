@@ -1,14 +1,10 @@
 import passport from 'passport';
 import GitHubStrategy from 'passport-github2';
-import local from 'passport-local';
 import jwt from 'passport-jwt';
 import usersModel from '../dao/dbManagers/models/users.models.js';
 import { createHash, isValidPassword } from '../utils.js';
 import {passportStrategiesEnum, accessRolesEnum} from '../config/enums.js';
 import {PRIVATE_KEY_JWT} from '../config/constants.js';
-
-//local
-const localStrategy = local.Strategy;
 
 // estrategia JWT
 const JWTSrategy = jwt.Strategy;
@@ -16,32 +12,6 @@ const ExtractJWT = jwt.ExtractJwt;
 
 const initializePassport = () => {
     //registro
-    passport.use('register', new localStrategy({
-        passReqToCallback: true, //permite acceder al objeto request como cualquier otro middleware
-        usernameField: 'email'
-    }, async (req, username, password, done) => {
-        try {
-            const { first_name, last_name, age } = req.body;
-            const user = await usersModel.findOne({ email: username });
-            
-            if(user) {
-                return done(null, false);
-            }
-
-            const userToSave = {
-                first_name,
-                last_name,
-                email: username,
-                age,
-                password: createHash(password)
-            }
-
-            const result = await usersModel.create(userToSave);
-            return done(null, result); //req.user {first,last,age,email}
-        } catch (error) {
-            console.log(error)
-        }
-    }));
     passport.use('github', new GitHubStrategy({
         clientID:  'Iv1.da29b1c177ee2618',
         clientSecret: '0f8c0a891165fcb2a006b0ea1c5f443478e15fba',
@@ -75,23 +45,6 @@ const initializePassport = () => {
         }
     }));
     
-    passport.use('login', new localStrategy({
-        usernameField: 'email'
-    }, async(username, password, done) => {
-        try {
-            const user = await usersModel.findOne({ email: username});
-            if(!user || !isValidPassword(password, user.password)){
-                return done(null, false)
-            }
-
-            return done(null, user);
-
-        } catch (error) {
-            
-            console.log(error)
-
-        }
-    })) 
 
     //serializacion
 
@@ -105,8 +58,16 @@ const initializePassport = () => {
         
     })
 
+    const cookieExtractor = req => {
+        let token = null;
+        if(req && req.cookies) {
+            token = req.cookies['coderCookieToken'];
+        }
+        return token;
+    }
+
     passport.use(passportStrategiesEnum.JWT, new JWTSrategy({
-        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+        jwtFromRequest: cookieExtractor,
         secretOrKey: PRIVATE_KEY_JWT
     }, async(jwt_payload, done) => {
         try {
@@ -116,5 +77,6 @@ const initializePassport = () => {
         }
     }))
 }
+
 
 export {initializePassport};

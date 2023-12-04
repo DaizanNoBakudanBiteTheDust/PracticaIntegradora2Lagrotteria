@@ -46,25 +46,15 @@ router.post('/login', async (req, res) => {
             return res.send({ status: 'success', message: 'Inicio de sesión como administrador exitoso' });
         }
        
-        passport.authenticate('login', async (err, user) => {
-            if (err || !user) {
-                return res.status(401).send({ status: 'error', message: 'Credenciales inválidas' });
-            }
-    
-            req.session.user = {
-                name: `${user.first_name} ${user.last_name}`,
-                email: user.email,
-                age: user.age,
-                role: 'user'
-            };
+        const user = await usersModel.findOne({ email: email });
 
-            const accessToken = generateToken(user);
-    
-            return res.status(200).send({accessToken, status: 'success', message: 'Inicio de sesión exitoso' });
-        })(req, res);
-    
+        //generar el jwt
+        const { password: _, ...userResult } = user;
+        const accessToken = generateToken(userResult);    
+        res.cookie('coderCookieToken', accessToken, { maxAge: 60 * 60 * 1000, httpOnly: true }).send({ status: 'success', message: 'login success' })
 
 });
+
 
 router.get('/fail-login', async (req, res) => {
     res.status(500).send({
@@ -90,6 +80,11 @@ router.get('/github', passport.authenticate('github', {scope: ['user:email']}), 
 router.get('/github-callback', passport.authenticate('github', { failureRedirect: '/login' }), async(req, res) => {
     req.session.user = req.user;
     res.redirect('/');
+});
+
+router.get('/current', passport.authenticate('jwt', { session: false }), (req, res) => {
+    // Si el middleware de autenticación JWT pasa, req.user contendrá la información del usuario extraída del token
+    res.status(200).json({ user: req.user });
 });
 
 export default router;
