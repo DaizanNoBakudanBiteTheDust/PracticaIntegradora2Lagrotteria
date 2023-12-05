@@ -61,6 +61,13 @@ router.post('/login', async (req, res) => {
 
     const user = await manager.getByEmail(email);
 
+    if (!user.carts || user.carts.length === 0) {
+        // Si el usuario no tiene un carrito, crea uno nuevo
+        const cart = await cartManager.save({ userId: user._id });
+        // Agrega el carrito recién creado al usuario
+        await manager.addToCartUser(user._id, cart._id);
+    }
+
     console.log(user.carts)
 
     //generar el jwt
