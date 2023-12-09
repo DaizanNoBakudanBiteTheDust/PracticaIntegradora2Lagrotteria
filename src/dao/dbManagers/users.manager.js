@@ -17,7 +17,7 @@ export default class Users {
 
     addToCartUser = async (userId, productId) => {
         try {
-            const user = await usersModel.findById(userId).populate('carts.cart');
+            const user = await usersModel.findById(userId);
             if (!user) {
                 console.error('Usuario no encontrado');
                 return; // En lugar de lanzar un error, simplemente salimos de la función
@@ -31,6 +31,7 @@ export default class Users {
     
             // Tomar el primer carrito del usuario
             const userCart = user.carts[0].cart;
+            console.log(userCart);
     
             // Agregar el producto al carrito del usuario
             userCart.products.push(productId);
