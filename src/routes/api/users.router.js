@@ -32,9 +32,9 @@ router.get('/fail-register', async (req, res) => {
     })
 });
 
-router.get(':uid', async (req, res) => {
-    const user = await manager.getByEmail(email);
-    console.log(user);
+router.get('/:uid', async (req, res) => {
+    console.log(req.params);
+    res.send(req.params);
 });
 
 const adminUser = {
