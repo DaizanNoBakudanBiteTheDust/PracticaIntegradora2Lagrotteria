@@ -4,6 +4,7 @@
     <p>correo: {{user.email}}</p>
     <p>edad: {{user.age}}</p>
     <p>rol: {{user.role}}</p>
+    <p>cart: {{user.carts}}</p>
 </div>
 
 <div class="float-end">
@@ -22,7 +23,7 @@
         <li>stock: ${{this.stock}}</li>
         <li>Categoria: {{this.category}}</li>
         <li>ID: {{this._id}}</li>
-         <button type="button" class="btn" onclick="addProduct('{{this._id}}')">Agregar al Carrito</button>
+         <button type="button" class="btn" onclick="addProduct('{{this._id}}', '{{user.cart._id}}')">Agregar al Carrito</button>
     </ul>
     {{/each}}
     {{#if hasNextPage}}

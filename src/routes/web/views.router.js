@@ -1,20 +1,15 @@
 import {
     Router
 } from 'express'
-// import { productsFilePath } from '../../utils.js';
-
-//import ProductManager from '../../dao/fileManagers/productManager.js';
 import Products from '../../dao/dbManagers/products.manager.js';
 import Carts from '../../dao/dbManagers/cart.manager.js';
 import Messages from '../../dao/dbManagers/message.manager.js';
 import usersModel from '../../dao/dbManagers/models/users.models.js';
 import passport from 'passport';
-import jwt from 'passport-jwt';
-
+import {passportStrategiesEnum, accessRolesEnum} from '../../config/enums.js';
 import {
     productsModel
 } from "../../dao/dbManagers/models/products.models.js";
-import { PRIVATE_KEY_JWT } from '../../config/constants.js';
 
 const router = Router();
 
@@ -74,7 +69,6 @@ router.get('/', privateAccess, async (req, res) => {
             userData = user._doc;
         }
 
-        console.log(user);
         // Obtener todos los productos
         const allProducts = await prodManager.getAll(req);
 

@@ -1,9 +1,8 @@
-const carritoId = '6548f637d8891916f4b7065b';
-
-async function addProduct(pid) {
+async function addProduct(pid, userId) {
     try {
+        
          // Realiza la solicitud al servidor para obtener el carrito
-         const response = await fetch(`/api/carts/${carritoId}`);
+         const response = await fetch(`/api/sessions/${{userId}}`);
 
          if (!response.ok) {
              throw new Error('Error en la solicitud al servidor');
@@ -11,6 +10,8 @@ async function addProduct(pid) {
          // Convierte el cuerpo de la respuesta en un objeto JSON
          const data = await response.json();
  
+         console.log(data)
+
          const cartData = data.payload;
  
          // Buscar el producto en el carrito por el ID del producto

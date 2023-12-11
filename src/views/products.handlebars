@@ -16,7 +16,7 @@
         <li>stock: ${{this.stock}}</li>
         <li>Categoria: {{this.category}}</li>
         <li>ID: {{this._id}}</li>
-        <button type="button" class="btn" onclick="addProduct('{{this._id}}')">Agregar al Carrito</button>
+        <button type="button" class="btn" onclick="addProduct('{{this._id}}', '{{user.cart._id}}')">Agregar al Carrito</button>
     </ul>
 </div>
     {{/each}}

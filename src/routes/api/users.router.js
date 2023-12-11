@@ -2,7 +2,6 @@ import {
     Router
 } from 'express';
 import passport from 'passport';
-import usersModel from '../../dao/dbManagers/models/users.models.js';
 import {
     createHash,
     isValidPassword,
@@ -33,6 +32,10 @@ router.get('/fail-register', async (req, res) => {
     })
 });
 
+router.get(':uid', async (req, res) => {
+    const user = await manager.getByEmail(email);
+    console.log(user);
+});
 
 const adminUser = {
     email: 'adminCoder@coder.com',
@@ -60,15 +63,20 @@ router.post('/login', async (req, res) => {
     }
 
     const user = await manager.getByEmail(email);
+    console.log(user);
 
     if (!user.carts || user.carts.length === 0) {
         // Si el usuario no tiene un carrito, crea uno nuevo
         const cart = await cartManager.save({ userId: user._id });
+
+        
+
+        const userCart =  user.carts;
+        console.log(userCart)
         // Agrega el carrito recién creado al usuario
-        await manager.addToCartUser(user._id, cart._id);
+
     }
 
-    console.log(user.carts)
 
     //generar el jwt
     const {
