@@ -69,13 +69,13 @@ router.get('/', privateAccess, async (req, res) => {
             userData = user._doc;
         }
 
+        console.log(userData)
         // Obtener todos los productos
         const allProducts = await prodManager.getAll(req);
-        console.log();
 
         res.render('home', {
             user: userData,
-            cartId: userData.carts[0]._id,
+            cartId: userData.carts[0].cart._id,
             products: allProducts
         });
     } catch (error) {

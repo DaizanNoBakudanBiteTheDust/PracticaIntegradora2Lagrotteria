@@ -1,25 +1,24 @@
-async function addProduct(pid, user) {
+
+
+async function addProduct(pid, cartId) {
     try {
-        console.log(user.cart);
-        /*
+        console.log(cartId);
          // Realiza la solicitud al servidor para obtener el carrito
-         console.log({cartId});
-         const response = await fetch(`/api/sessions/${cartId}`);
-         console.log(response)
+         const response = await fetch(`/api/carts/${cartId}`);
+
          if (!response.ok) {
             
              throw new Error('Error en la solicitud al servidor');
          }
          // Convierte el cuerpo de la respuesta en un objeto JSON
          const data = await response.json();
- 
-         console.log(data)
 
          const cartData = data.payload;
+         
 
          // Buscar el producto en el carrito por el ID del producto
-         //const existingProductIndex = cartData.products.find(p => p.product._id.toString() === pid);
-
+         const existingProductIndex = cartData.products.find(p => p.product._id.toString() === pid);
+        
         if (existingProductIndex) {
             // Si el producto ya existe en el carrito, incrementa la cantidad
             existingProductIndex.quantity += 1;
@@ -35,7 +34,7 @@ async function addProduct(pid, user) {
        // Agrega el producto al arreglo "products" del carrito
        cartData.products.push(addedProduct);
      }
- */
+ 
      Toastify({
         text: `tu producto ha sido agregado al carrito`,
         gravity: "bottom",
@@ -43,7 +42,7 @@ async function addProduct(pid, user) {
     }).showToast();
  
          // Realizar una solicitud fetch para actualizar el carrito
-   /*      const updateResponse = await fetch(`/api/sessions/${cartId}`, {
+         const updateResponse = await fetch(`/api/carts/${cartId}`, {
              method: 'PUT',
              headers: {
                  'Content-Type': 'application/json'
@@ -53,7 +52,7 @@ async function addProduct(pid, user) {
          if (updateResponse.status === 200) {
              console.log('Producto añadido al carrito', cartData);
          };
- */
+
      
     } catch (error) {
         console.log(error);

@@ -13,6 +13,7 @@
 
      <h1>Productos</h1>
 
+
     {{#each products}}
     <ul>
         <li>TITULO: {{this.titulo}}</li>
@@ -23,7 +24,7 @@
         <li>stock: ${{this.stock}}</li>
         <li>Categoria: {{this.category}}</li>
         <li>ID: {{this._id}}</li>
-        <button type="button" class="btn" onclick="addProduct('{{this._id}}', '{{../user.carts}}')">Agregar al Carrito</button>
+        <button type="button" class="btn" onclick="addProduct('{{this._id}}', '{{../cartId}}')">Agregar al Carrito</button>
     </ul>
     {{/each}}
 

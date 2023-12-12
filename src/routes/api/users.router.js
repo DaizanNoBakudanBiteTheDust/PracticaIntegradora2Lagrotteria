@@ -32,10 +32,6 @@ router.get('/fail-register', async (req, res) => {
     })
 });
 
-router.get('/:uid', async (req, res) => {
-    console.log(req.params);
-    res.send(req.params);
-});
 
 const adminUser = {
     email: 'adminCoder@coder.com',
@@ -113,6 +109,12 @@ router.get('/logout', (req, res) => {
         res.clearCookie('coderCookieToken');
         res.redirect('/login'); // Redirige a donde quieras después del logout
     });
+});
+
+
+router.get('/:uid', async (req, res) => {
+    console.log(req.params);
+    res.send(req.params);
 });
 
 router.get('/github', passport.authenticate('github', {
